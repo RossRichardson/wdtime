@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mock Workday Timesheet</title>
+  <style>
+    body { font-family: sans-serif; padding: 24px; }
+    .row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    label { width: 120px; }
+    input { border: 1px solid #ccc; padding: 4px 8px; width: 80px; }
+  </style>
+</head>
+<body>
+  <h1>Mock Timesheet</h1>
+  <p>These inputs mirror the Workday <code>data-automation-id="numericInput"</code> pattern.</p>
+
+  <!-- Row 1 -->
+  <div class="row">
+    <label>Monday</label>
+    <div class="numericWidget" data-automation-id="numericWidget" style="position:relative;display:inline-block;">
+      <div class="gwt-Label" data-automation-id="numericText">7.6</div>
+      <input
+        type="text"
+        class="gwt-TextBox WPOO WENO WHOO"
+        data-automation-id="numericInput"
+        aria-required="false"
+        id="56$mon-input"
+        dir="ltr"
+        aria-invalid="false"
+        tabindex="0"
+      />
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="row">
+    <label>Tuesday</label>
+    <div class="numericWidget" data-automation-id="numericWidget" style="position:relative;display:inline-block;">
+      <div class="gwt-Label" data-automation-id="numericText">5</div>
+      <input
+        type="text"
+        class="gwt-TextBox WPOO WENO WHOO"
+        data-automation-id="numericInput"
+        aria-required="false"
+        id="56$tue-input"
+        dir="ltr"
+        aria-invalid="false"
+        tabindex="0"
+      />
+    </div>
+  </div>
+
+  <!-- Row 3 is NOT in the DOM at load time; it is created dynamically by the
+       button below to exercise the MutationObserver in the content script. -->
+
+  <button id="add-dynamic" style="margin-top:16px">Add dynamic row (simulates SPA navigation)</button>
+
+  <script>
+    document.getElementById('add-dynamic').addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.id = 'dynamic-row';
+      row.className = 'row';
+      row.innerHTML = `
+        <label>Wednesday</label>
+        <div class="numericWidget" data-automation-id="numericWidget" style="position:relative;display:inline-block;">
+          <input
+            type="text"
+            class="gwt-TextBox WPOO WENO WHOO"
+            data-automation-id="numericInput"
+            aria-required="false"
+            id="56$wed-input"
+            dir="ltr"
+            aria-invalid="false"
+            tabindex="0"
+          />
+        </div>`;
+      document.body.appendChild(row);
+    });
+  </script>
+</body>
+</html>

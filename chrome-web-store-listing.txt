@@ -1,0 +1,41 @@
+Title
+Workday Timesheet Helper
+
+Short description
+Adds a quick clock picker to Workday timesheet hour fields and inserts the matching converted value.
+
+Detailed description
+Workday Timesheet Helper adds a compact clock picker beside supported Workday timesheet hour fields.
+
+It helps users choose standard hours and automatically inserts the corresponding fractional value used by Workday.
+
+Features:
+- Adds a clock picker next to Workday timesheet hour fields
+- Converts standard hours to Workday fractional values using the 0.95 mapping
+- Keeps the normal Workday edit flow intact
+- Highlights standard converted values and non-standard entries for quick review
+- Works with dynamically updated Workday pages
+
+This extension is designed to speed up repetitive timesheet entry and reduce conversion mistakes.
+
+Single purpose description
+This extension enhances Workday timesheet hour entry by adding an in-page picker that inserts converted Workday hour values into supported time-entry fields.
+
+Privacy disclosure
+This extension runs locally in the browser on Workday pages. It does not transmit timesheet values or page data to external services.
+
+Permission justification
+The extension needs access to myworkday.com pages so it can detect supported Workday timesheet hour inputs and add the in-page conversion picker.
+
+Suggested screenshots
+1. A timesheet row with the clock button visible beside an hour field
+2. The dropdown open with conversion choices visible
+3. A selected value applied with the green highlight visible
+4. The popup conversion table
+
+Do not include in screenshots
+- Employee names
+- Project names or codes
+- Worktags or client names
+- Browser profile details
+- Any internal company identifiers
