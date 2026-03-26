@@ -1,0 +1,94 @@
+name: Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          version=$(node -p "require('./manifest.json').version")
+          package_version=$(node -p "require('./package.json').version")
+
+          if [ "$version" != "$package_version" ]; then
+            echo "manifest.json and package.json versions do not match" >&2
+            exit 1
+          fi
+
+          expected_tag="v${version}"
+          if [ "$tag" != "$expected_tag" ]; then
+            echo "Tag $tag does not match expected version tag $expected_tag" >&2
+            exit 1
+          fi
+
+          release_name="workday-timesheet-helper-${version}"
+          asset_path="dist/${release_name}.zip"
+          body_path="release-notes/${tag}.md"
+
+          if [ ! -f "$body_path" ]; then
+            body_path="${RUNNER_TEMP}/release-notes.md"
+            printf '# %s\n\nAutomated GitHub release build.\n' "$tag" > "$body_path"
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
+          echo "body_path=$body_path" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifact
+        run: npm run release:build
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: workday-timesheet-helper-${{ steps.meta.outputs.version }}
+          path: ${{ steps.meta.outputs.asset_path }}
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          body_path: ${{ steps.meta.outputs.body_path }}
+          files: ${{ steps.meta.outputs.asset_path }}
+          overwrite_files: true
+          generate_release_notes: false
